@@ -28,7 +28,7 @@ BACKUP_NAME="backup_$(basename "$SOURCE_DIR")_$TIMESTAMP.tar.gz"
 
 
 # Creating a Backup
-echo "Создание резервной копии $SOURCE_DIR..."
+echo "Creating a Backup $SOURCE_DIR..."
 tar -czf "$BACKUP_DIR/$BACKUP_NAME" -C "$(dirname "$SOURCE_DIR")" "$(basename "$SOURCE_DIR")"
 
 # Checking whether the archive was created successfully
@@ -37,8 +37,8 @@ if [ $? -eq 0 ]; then
   # Logging
   echo "$(date +"%Y-%m-%d %H:%M:%S") - Backup copy $BACKUP_NAME created successfully." >> "$LOG_DIR/backup.log"
 else
-  echo "Ошибка при создании резервной копии."
-  echo "$(date +"%Y-%m-%d %H:%M:%S") - Ошибка при создании резервной копии $BACKUP_NAME." >> "$LOG_DIR/backup.log"
+  echo "Error creating backup."
+  echo "$(date +"%Y-%m-%d %H:%M:%S") - Error creating backup $BACKUP_NAME." >> "$LOG_DIR/backup.log"
   exit 1
 fi
 
@@ -46,3 +46,26 @@ fi
 BACKUP_SIZE=$(du -h "$BACKUP_DIR/$BACKUP_NAME" | cut -f1)
 echo "Backup size: $BACKUP_SIZE"
 echo "$(date +"%Y-%m-%d %H:%M:%S") - Backup size: $BACKUP_SIZE" >> "$LOG_DIR/backup.log"
+
+# Ask user where to save the backup
+read -p "Want to save a backup to a remote server? (y/n): " REMOTE_BACKUP
+
+if [[ "$REMOTE_BACKUP" == "y" || "$REMOTE_BACKUP" == "Y" ]]; then
+  read -p "Enter the address of the remote server (e.g. user@remotehost): " REMOTE_HOST
+  read -p "Enter the path on the remote server to save the backup: " REMOTE_PATH
+
+  # Copy backup to remote server
+  echo "Copying backup to remote server..."
+  rsync -avz "$BACKUP_DIR/$BACKUP_NAME" "$REMOTE_HOST:$REMOTE_PATH"
+
+  if [ $? -eq 0 ]; then
+    echo "The backup has been successfully copied to the remote server."
+    echo "$(date +"%Y-%m-%d %H:%M:%S") - Backup $BACKUP_NAME successfully copied to $REMOTE_HOST:$REMOTE_PATH" >> "$LOG_DIR/backup.log"
+  else
+    echo "Error copying backup to remote server."
+    echo "$(date +"%Y-%m-%d %H:%M:%S") - Error copying backup $BACKUP_NAME to $REMOTE_HOST:$REMOTE_PATH" >> "$LOG_DIR/backup.log"
+    exit 1
+  fi
+else
+  echo "The backup is saved locally only."
+fi
