@@ -6,21 +6,25 @@ This script creates backup copies of the specified directory and saves them as a
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/ваш-username/backup-script.git
-cd backup-script 
+git clone https://github.com/ваш-username/backup-script.git 
 ```
 
-2. Make the script executable:
+2. Go to the downloaded repository
+```bash
+cd backup-scripts
+```
+
+3. Make the script executable:
 ```bash
 chmod +x backup.sh
 ```
 
-3. Run the script, specifying the backup directory:
+4. Run the script, specifying the backup directory:
 ```bash
 ./backup.sh /path/to/source
 ```
 
-4. The backup will be saved to the `backups/` directory, and the logs will be saved to `logs/`.
+5. The backup will be saved to the `backups/` directory, and the logs will be saved to `logs/`.
 
 # Example
 ```bash
